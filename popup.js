@@ -16,6 +16,23 @@ const loadedFontLinks = new Set();
 function gkey(name){ return name.replace(/\s+/g,'+'); }
 
 
+async function getSystemFonts() {
+  try {
+    if (!navigator.fonts || !navigator.fonts.query) return [];
+    const fonts = await navigator.fonts.query();
+    const names = [];
+    for (const f of fonts) {
+     
+      const n = f.fullName || f.family || f.postScriptName;
+      if (n && !names.includes(n)) names.push(n);
+    }
+    return names;
+  } catch (e) {
+    console.warn('system fonts not available', e);
+    return [];
+  }
+}
+
 async function getGoogleFonts() {
   try {
    
