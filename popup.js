@@ -15,24 +15,6 @@ const loadedFontLinks = new Set();
 
 function gkey(name){ return name.replace(/\s+/g,'+'); }
 
-
-async function getSystemFonts() {
-  try {
-    if (!navigator.fonts || !navigator.fonts.query) return [];
-    const fonts = await navigator.fonts.query();
-    const names = [];
-    for (const f of fonts) {
-     
-      const n = f.fullName || f.family || f.postScriptName;
-      if (n && !names.includes(n)) names.push(n);
-    }
-    return names;
-  } catch (e) {
-    console.warn('system fonts not available', e);
-    return [];
-  }
-}
-
 async function getGoogleFonts() {
   try {
    
@@ -41,35 +23,9 @@ async function getGoogleFonts() {
     
     return json.map(f => f.family);
   } catch (e) {
-    console.warn("Local JSON fetch failed, using fallback", e);
-    return FALLBACK_GOOGLE;
+    console.warn("Local JSON fetch failed,", e);
+    return;
   }
-}
-
-
-function combineFonts(systemFonts, googleFonts){
-  const set = new Set();
-  systemFonts.forEach(f => set.add(f));
-  googleFonts.forEach(f => set.add(f));
-  const arr = Array.from(set);
-  arr.sort((a,b)=>a.localeCompare(b));
-  return arr;
-}
-
-function populateSelects(favList){
-  
-  const saved = {};
-  chrome.storage.sync.get(['uiFont','codeFont'], ({uiFont, codeFont}) => {
-    saved.uiFont = uiFont;
-    saved.codeFont = codeFont;
-    
-    for (const f of favList){
-      const o1 = document.createElement('option'); o1.value=f; o1.textContent=f; uiSelect.appendChild(o1);
-      const o2 = document.createElement('option'); o2.value=f; o2.textContent=f; codeSelect.appendChild(o2);
-    }
-    if(saved.uiFont) uiSelect.value = saved.uiFont;
-    if(saved.codeFont) codeSelect.value = saved.codeFont;
-  });
 }
 
 
@@ -128,22 +84,10 @@ function renderChunk(filter = '') {
 
 
     btnUI.addEventListener('click', () => {
-      if (![...uiSelect.options].some(o => o.value === name)) {
-        const op = document.createElement('option');
-        op.value = name;
-        op.textContent = name;
-        uiSelect.appendChild(op);
-      }
       uiSelect.value = name;
     });
 
     btnCode.addEventListener('click', () => {
-      if (![...codeSelect.options].some(o => o.value === name)) {
-        const op = document.createElement('option');
-        op.value = name;
-        op.textContent = name;
-        codeSelect.appendChild(op);
-      }
       codeSelect.value = name;
     });
 
@@ -228,23 +172,15 @@ function injectFontsToTab(tabId, uiFont, codeFont){
 }
 
 (async function init(){
-  loadingEl.textContent = 'Collecting system fonts…';
-  const sys = await getSystemFonts();
+
   loadingEl.textContent = 'Fetching Google Fonts metadata…';
   const g = await getGoogleFonts();
-  allFonts = combineFonts(sys, g);
- 
-  populateSelects([ 'Inter','Poppins','Roboto','Open Sans','JetBrains Mono','Fira Code','Source Code Pro','Source Sans Pro','Montserrat' ]);
+
+  allFonts = g;
   loadingEl.textContent = '';
   refreshList('');
 
   chrome.storage.sync.get(['uiFont','codeFont'], ({uiFont, codeFont}) => {
-    if (uiFont && ![...uiSelect.options].some(o=>o.value===uiFont)) {
-      const op = document.createElement('option'); op.value=uiFont; op.textContent=uiFont; uiSelect.appendChild(op);
-    }
-    if (codeFont && ![...codeSelect.options].some(o=>o.value===codeFont)) {
-      const op2 = document.createElement('option'); op2.value=codeFont; op2.textContent=codeFont; codeSelect.appendChild(op2);
-    }
     if (uiFont) uiSelect.value = uiFont;
     if (codeFont) codeSelect.value = codeFont;
   });

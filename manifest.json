@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LeetCode Font Changer (All Fonts)",
-  "version": "1.1",
+  "version": "1.0",
   "description": "Pick any system or Google font and force it across LeetCode (UI + code).",
   "permissions": ["storage", "scripting", "activeTab"],
   "host_permissions": ["*://*.leetcode.com/*"],
@@ -14,7 +14,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.leetcode.com/*","https://fonts.google.com/*", "https://www.googleapis.com/*"],
+      "matches": ["*://*.leetcode.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
