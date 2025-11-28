@@ -12,31 +12,9 @@ let renderedCount = 0;
 const PAGE_SIZE = 100; 
 const loadedFontLinks = new Set(); 
 
-const FALLBACK_GOOGLE = [
-  "Inter","Poppins","Roboto","Open Sans","Lato","Merriweather","Ubuntu",
-  "JetBrains Mono","Fira Code","Source Code Pro","Source Sans Pro","Montserrat"
-];
-
 
 function gkey(name){ return name.replace(/\s+/g,'+'); }
 
-
-async function getSystemFonts() {
-  try {
-    if (!navigator.fonts || !navigator.fonts.query) return [];
-    const fonts = await navigator.fonts.query();
-    const names = [];
-    for (const f of fonts) {
-     
-      const n = f.fullName || f.family || f.postScriptName;
-      if (n && !names.includes(n)) names.push(n);
-    }
-    return names;
-  } catch (e) {
-    console.warn('system fonts not available', e);
-    return [];
-  }
-}
 
 async function getGoogleFonts() {
   try {
