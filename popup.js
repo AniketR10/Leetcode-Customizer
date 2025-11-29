@@ -54,13 +54,13 @@ function renderChunk(filter = '') {
     actions.className = 'font-actions';
 
     const btnUI = document.createElement('button');
-    btnUI.textContent = 'Use UI';
+    btnUI.textContent = 'UI font';
     btnUI.className = 'secondary';
-    btnUI.style.cssText = 'background:#e0e0e0;border:0;padding:6px;border-radius:6px;';
+    btnUI.style.cssText = 'background:#3a3a3a;color:#1a90ff;border:0;padding:4px;margin-right:6px;border-radius:6px;';
 
     const btnCode = document.createElement('button');
-    btnCode.textContent = 'Use Code';
-    btnCode.style.cssText = 'background:#0b69ff;color:white;border:0;padding:6px;border-radius:6px;';
+    btnCode.textContent = 'Code';
+    btnCode.style.cssText = 'background:#3a3a3a;color:#1a90ff;border:0;padding:4px;border-radius:6px;';
 
    
     const ensureFontLoaded = async () => {
@@ -202,6 +202,10 @@ applyBtn.addEventListener('click', async () => {
 
 resetBtn.addEventListener('click', async () => {
   await chrome.storage.sync.remove(['uiFont','codeFont']);
+
+  uiSelect.value = '';
+  codeSelect.value = '';
+  
   chrome.tabs.query({active:true,currentWindow:true}, (tabs) => {
     if (!tabs[0]) return;
     chrome.scripting.executeScript({
