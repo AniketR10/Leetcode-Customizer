@@ -6,6 +6,10 @@ const searchInput = document.getElementById('search');
 const applyBtn = document.getElementById('apply');
 const resetBtn = document.getElementById('reset');
 const loadingEl = document.getElementById('loading');
+const uiSizeRange = document.getElementById('uiSizeRange');
+const uiSizeInput = document.getElementById('uiSizeInput');
+const codeSizeRange = document.getElementById('codeSizeRange');
+const codeSizeInput = document.getElementById('codeSizeInput');
 
 let allFonts = []; 
 let renderedCount = 0;
@@ -13,7 +17,18 @@ const PAGE_SIZE = 100;
 const loadedFontLinks = new Set(); 
 
 
-function gkey(name){ return name.replace(/\s+/g,'+'); }
+function gkey(name){ 
+  if(!name) return '';
+  return name.replace(/\s+/g,'+');
+}
+
+function linkInputs(range, number){
+  range.addEventListener('input', () => {number.value = range.value});
+  number.addEventListener('input', () => {range.value = number.value});
+}
+
+linkInputs(uiSizeRange, uiSizeInput);
+linkInputs(codeSizeRange, codeSizeInput);
 
 async function getGoogleFonts() {
   try {
@@ -135,10 +150,10 @@ searchInput.addEventListener('input', (e) => {
 
 
 
-function injectFontsToTab(tabId, uiFont, codeFont){
+function injectFontsToTab(tabId, uiFont, codeFont, uiSize, codeSize){
   chrome.scripting.executeScript({
     target: { tabId },
-    func: (uiFont, codeFont) => {
+    func: (uiFont, codeFont, uiSize, codeSize) => {
   
       const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
       [uiFont, codeFont].filter(Boolean).forEach(fn => {
@@ -159,15 +174,21 @@ function injectFontsToTab(tabId, uiFont, codeFont){
       style.id = 'lc-font-changer-style';
       style.textContent = `
         /* Global UI */
+        body {font-size: ${uiSize}px !important; }
         * { font-family: "${uiFont || 'Inter'}", sans-serif !important; }
+
         /* Code editors and monospace areas */
-        .monaco-editor *, .cm-editor *, code, pre { font-family: "${codeFont || 'JetBrains Mono'}", monospace !important; }
-        /* Try to preserve icon fonts by not replacing them: */
+        .monaco-editor *, .cm-editor *, code, pre { 
+        font-family: "${codeFont || 'JetBrains Mono'}", monospace !important; 
+        font-size: ${codeSize}px !important;
+        }
+
+        /* preserve icons */
         [class*="icon"], .codicon, [class^="icon-"], .anticon { font-family: inherit !important; }
       `;
       head.appendChild(style);
     },
-    args: [uiFont, codeFont]
+    args: [uiFont, codeFont, uiSize, codeSize]
   });
 }
 
@@ -183,28 +204,42 @@ function injectFontsToTab(tabId, uiFont, codeFont){
   chrome.storage.sync.get(['uiFont','codeFont'], ({uiFont, codeFont}) => {
     if (uiFont) uiSelect.value = uiFont;
     if (codeFont) codeSelect.value = codeFont;
+
+    const uSize = data.uiSize || 14;
+    const cSize = data.codeSize || 14;
+
+    uiSizeRange.value = uSize;
+    uiSizeInput.value = uSize;
+    codeSizeRange.value = cSize;
+    codeSizeInput.value = cSize;
   });
-
-
 })();
 
 
 applyBtn.addEventListener('click', async () => {
   const uiFont = uiSelect.value;
   const codeFont = codeSelect.value;
-  await chrome.storage.sync.set({uiFont, codeFont});
+  const uiSize = uiSizeInput.value;
+  const codeSize = codeSizeInput.value;
+
+  await chrome.storage.sync.set({uiFont, codeFont, uiSize, codeSize});
  
   chrome.tabs.query({active:true, currentWindow:true}, (tabs) => {
     if (!tabs[0]) return;
-    injectFontsToTab(tabs[0].id, uiFont, codeFont);
+    injectFontsToTab(tabs[0].id, uiFont, codeFont, uiSize, codeSize);
   });
 });
 
 resetBtn.addEventListener('click', async () => {
-  await chrome.storage.sync.remove(['uiFont','codeFont']);
+  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize']);
 
   uiSelect.value = '';
   codeSelect.value = '';
+
+  uiSizeInput.value = 14;
+  uiSizeRange.value = 14;
+  codeSizeInput.value = 14;
+  codeSizeRange.value = 14;
   
   chrome.tabs.query({active:true,currentWindow:true}, (tabs) => {
     if (!tabs[0]) return;

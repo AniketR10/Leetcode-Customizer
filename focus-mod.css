@@ -1,13 +1,12 @@
 :root {
-  /* --- User Defined Colors --- */
-  --surface-primary: #323232;  /* The main container color */
-  --surface-hover:   #3a3a3a;  /* The hover color */
+  --surface-primary: #323232;  
+  --surface-hover:   #3a3a3a;  
   
-  /* --- LeetCode/Dark Theme Accents --- */
-  --bg-color:        #1a1a1a;  /* The main window background (darker) */
-  --text-main:       #eff1f6;  /* Bright white text */
-  --text-muted:      #9ca3af;  /* Gray text */
-  --brand-orange:    #ffa116;  /* LeetCode Orange */
+
+  --bg-color:        #1a1a1a;  
+  --text-main:       #eff1f6;  
+  --text-muted:      #9ca3af;  
+  --brand-orange:    #ffa116; 
   --brand-green:      #28c244;
   --brand-blue:       #1a90ff;
   
@@ -31,39 +30,38 @@ h3 {
   color: var(--text-main);
 }
 
-/* --- Layout Utilities --- */
+
 .controls, .select-row {
   display: flex;
   gap: var(--gap);
   margin-bottom: 12px;
 }
 
-/* Wrappers to replace flex:1 inline styles */
+
 .controls > *, .select-row > div {
   flex: 1;
 }
 
-/* --- Inputs (Using #323232) --- */
+
 input[type="search"], 
 input[readonly] {
   padding: 10px;
   border: 1px solid transparent;
   border-radius: 6px;
   width: 100%;
-  box-sizing: border-box; /* Ensures padding doesn't break width */
-  
-  background-color: var(--surface-primary); /* #323232 */
+  box-sizing: border-box; 
+  background-color: var(--surface-primary); 
   color: var(--text-main);
   outline: none;
   font-size: 13px;
 }
 
-input:focus {
+input[type="search"]:focus {
   border-color: var(--brand-orange);
-  background-color: var(--surface-hover); /* #3a3a3a on focus */
+  background-color: var(--surface-hover); 
 }
 
-/* --- Buttons --- */
+
 button {
   padding: 8px 16px;
   border-radius: 6px;
@@ -79,17 +77,17 @@ button:hover {
   opacity: 0.7;
 }
 
-/* Secondary Button uses the gray palette */
+
 button.secondary {
-  background: var(--brand-orange); /* #323232 */
+  background: var(--brand-orange); 
   color: var(--text-main);
 }
 
 button.secondary:hover {
-  opacity: 0.7;   /* #3a3a3a */
+  opacity: 0.7;   
 }
 
-/* --- Font List Container --- */
+
 #fontList {
   height: 320px;
   overflow-y: auto;
@@ -98,11 +96,11 @@ button.secondary:hover {
   border-radius: 8px;
   margin-top: 10px;
   
-  /* Make the list background match the input color */
-  background: var(--surface-primary); /* #323232 */
+
+  background: var(--surface-primary); 
 }
 
-/* --- Individual Font Items --- */
+
 .font-item {
   display: flex;
   justify-content: space-between;
@@ -115,7 +113,7 @@ button.secondary:hover {
 }
 
 .font-item:hover {
-  background-color: var(--text-muted); /* #3a3a3a */
+  background-color: var(--text-muted); 
 }
 
 .font-name {
@@ -133,7 +131,7 @@ button.secondary:hover {
   max-width: 120px;
 }
 
-/* --- Loading & Misc --- */
+
 #loading {
   font-size: 13px;
   color: var(--text-muted);
@@ -141,7 +139,7 @@ button.secondary:hover {
   text-align: center;
 }
 
-/* Scrollbar Styling (Optional, makes it look cleaner) */
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -151,4 +149,70 @@ button.secondary:hover {
 ::-webkit-scrollbar-thumb {
   background: var(--surface-hover); 
   border-radius: 4px;
+}
+
+/* --- Size Control Styling --- */
+.size-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.size-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* The small number box */
+input[type="number"] {
+  width: 40px;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  text-align: center;
+  font-size: 13px;
+  padding: 4px 0;
+}
+input[type="number"]:focus {
+  outline: none;
+  color: var(--brand-orange);
+}
+
+/* Remove up/down arrows from number input */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+/* Custom Range Slider Styling */
+input[type="range"] {
+  -webkit-appearance: none; /* Override default look */
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* The Slider Track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  background: var(--surface-hover);
+  border-radius: 2px;
+}
+
+/* The Slider Thumb (The circle you drag) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  margin-top: -5px; /* Centers thumb on track */
+  border: 2px solid var(--surface-primary);
 }

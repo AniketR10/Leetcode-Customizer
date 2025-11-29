@@ -22,6 +22,24 @@
     </div>
   </div>
 
+<div class="select-row">
+    <div class="input-wrapper" style="flex:1">
+      <label class="size-label">UI Size (px)</label>
+      <div class="size-control-row">
+        <input type="range" id="uiSizeRange" min="10" max="30" value="14" step="1">
+        <input type="number" id="uiSizeInput" value="14" min="10" max="30">
+      </div>
+    </div>
+
+    <div class="input-wrapper" style="flex:1">
+      <label class="size-label">Code Size (px)</label>
+      <div class="size-control-row">
+        <input type="range" id="codeSizeRange" min="10" max="30" value="14" step="1">
+        <input type="number" id="codeSizeInput" value="14" min="10" max="30">
+      </div>
+    </div>
+  </div>
+  
   <div style="display:flex;gap:8px;margin-bottom:8px">
     <button id="apply">Apply</button>
     <button class="secondary" id="reset">Reset</button>
