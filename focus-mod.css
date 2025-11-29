@@ -116,9 +116,20 @@ button.secondary:hover {
   background-color: var(--text-muted); 
 }
 
+.font-name-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  margin-right: 10px;
+}
+
 .font-name {
   font-weight: 500;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .font-preview {

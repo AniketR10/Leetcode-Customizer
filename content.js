@@ -4,14 +4,18 @@ function safeHead() {
 }
 
 function applyFontsFromStorage() {
-  chrome.storage.sync.get(['uiFont','codeFont'], ({ uiFont, codeFont }) => {
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize'], (data) => {
     const head = safeHead();
 
+    const {uiFont, codeFont} = data;
+
+    const uSize = data.uiSize || 14;
+    const cSize = data.codeSize || 14;
  
     const prev = document.getElementById('lc-font-changer-style');
     if (prev) prev.remove();
 
-    if (!uiFont && !codeFont) return;
+    if (!uiFont && !codeFont && !data.uiSize && !data.codeSize) return;
 
   
     [uiFont, codeFont]
@@ -31,10 +35,17 @@ function applyFontsFromStorage() {
     const style = document.createElement('style');
     style.id = 'lc-font-changer-style';
     style.textContent = `
+      /* UI font & size */
+      body { font-size: ${uSize}px !important; }
       * { font-family: "${uiFont || 'Inter'}", sans-serif !important; }
+      
+      /* Code font & Size */
       .monaco-editor *, .cm-editor *, code, pre {
         font-family: "${codeFont || 'JetBrains Mono'}", monospace !important;
+        font-size: ${cSize}px !important;
       }
+      
+      /* Preserve icons */
       [class*="icon"], .codicon, [class^="icon-"], .anticon {
         font-family: inherit !important;
       }
@@ -47,7 +58,7 @@ function applyFontsFromStorage() {
 applyFontsFromStorage();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && (changes.uiFont || changes.codeFont)) {
+  if (area === 'sync' && (changes.uiFont || changes.codeFont || changes.uiSize || changes.codeSize)) {
     applyFontsFromStorage();
   }
 });

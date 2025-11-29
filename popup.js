@@ -56,8 +56,7 @@ function renderChunk(filter = '') {
     item.className = 'font-item row';
 
     const left = document.createElement('div');
-    left.style.display = 'flex';
-    left.style.alignItems = 'center';
+    left.className = 'font-name-wrapper';
 
    
     const nameEl = document.createElement('div');
@@ -201,9 +200,9 @@ function injectFontsToTab(tabId, uiFont, codeFont, uiSize, codeSize){
   loadingEl.textContent = '';
   refreshList('');
 
-  chrome.storage.sync.get(['uiFont','codeFont'], ({uiFont, codeFont}) => {
-    if (uiFont) uiSelect.value = uiFont;
-    if (codeFont) codeSelect.value = codeFont;
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize'], (data) => {
+    if (data.uiFont) uiSelect.value = data.uiFont;
+    if (data.codeFont) codeSelect.value = data.codeFont;
 
     const uSize = data.uiSize || 14;
     const cSize = data.codeSize || 14;
