@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LeetCode Font Changer (All Fonts)",
+  "name": "LeetCode Customizer",
   "version": "1.0",
   "description": "Pick any system or Google font and force it across LeetCode (UI + code).",
   "permissions": ["storage", "scripting", "activeTab"],

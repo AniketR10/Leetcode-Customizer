@@ -1,20 +1,102 @@
-* {
-  display: none !important;
+:root {
+  --gap: 8px;
+  --pad: 10px;
 }
-
-html,
-body,
-*:has(article),
-article,
-article * {
-  display: revert !important;
+body {
+  font-family: Inter, Arial, sans-serif;
+  margin: 0;
+  padding: var(--pad);
+  min-width: 320px;
 }
-
-[role='navigation'] {
-  display: none !important;
+h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
 }
-
-article {
-  margin: auto;
-  max-width: 700px;
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.controls > * {
+  flex: 1;
+}
+input[type="search"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+}
+.select-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: 100%;
+}
+button {
+  padding: 8px;
+  border-radius: 6px;
+  border: 0;
+  background: #0b69ff;
+  color: white;
+  cursor: pointer;
+}
+button.secondary {
+  background: #e0e0e0;
+  color: #111;
+}
+#fontList {
+  height: 320px;
+  overflow: auto;
+  border: 1px solid #eee;
+  padding: 6px;
+  border-radius: 6px;
+  background: #fafafa;
+}
+.font-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+.font-name {
+  font-weight: 600;
+}
+.font-preview {
+  font-size: 14px;
+  color: #666;
+  margin-left: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.small {
+  font-size: 12px;
+  color: #666;
+}
+#loading {
+  font-size: 13px;
+  color: #666;
+  padding: 6px;
+  text-align: center;
+}
+.picker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.font-actions {
+  display: flex;
+  gap: 6px;
 }
