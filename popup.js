@@ -10,10 +10,9 @@ const uiSizeRange = document.getElementById('uiSizeRange');
 const uiSizeInput = document.getElementById('uiSizeInput');
 const codeSizeRange = document.getElementById('codeSizeRange');
 const codeSizeInput = document.getElementById('codeSizeInput');
-const themeSelect = document.getElementById('themeSelect');
+const bgColorPicker = document.getElementById('bgColorPicker');
 
 let allFonts = []; 
-let allThemes = [];
 let renderedCount = 0;
 const PAGE_SIZE = 100; 
 const loadedFontLinks = new Set(); 
@@ -32,22 +31,16 @@ function linkInputs(range, number){
 linkInputs(uiSizeRange, uiSizeInput);
 linkInputs(codeSizeRange, codeSizeInput);
 
-themeSelect.addEventListener('change', () => {
-  const selectedName = themeSelect.value;
-  const themeObj = allThemes.find(t => t.name === selectedName);
+bgColorPicker.addEventListener('input', () => {
+  const bgColor = bgColorPicker.value;
 
-  if(themeObj) {
+  if(bgColorPicker) {
     chrome.storage.sync.set({
-      editorThemeName: selectedName,
-      editorThemeColors: themeObj.colors
-    });
-  } else if(selectedName === ""){
-    chrome.storage.sync.set({
-      editorThemeName: "",
-      editorThemeColors: null
-    });
+      editorBgColor: bgColor,
+    })
   }
-});
+})
+
 
 async function getGoogleFonts() {
   try {
@@ -62,15 +55,6 @@ async function getGoogleFonts() {
   }
 }
 
-async function getThemes() {
-  try {
-    const res = await fetch(chrome.runtime.getURL('themes.json'));
-    return await res.json();
-  } catch(e) {
-    console.warn("Themes fetch failed", e);
-    return [];
-  }
-}
 
 function renderChunk(filter = '') {
   const fontsToRender = allFonts.filter(f =>
@@ -180,22 +164,13 @@ searchInput.addEventListener('input', (e) => {
 
   loadingEl.textContent = 'Loading resources…';
   const g = await getGoogleFonts();
-  const th = await getThemes();
   allFonts = g;
-  allThemes = th;
 
   loadingEl.textContent = '';
   refreshList('');
 
-  themeSelect.innerHTML = '';
-  allThemes.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.name;
-    opt.textContent = t.name;
-    themeSelect.appendChild(opt);
-  })
 
-  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeName'], (data) => {
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorBgColor'], (data) => {
     if (data.uiFont) uiSelect.value = data.uiFont;
     if (data.codeFont) codeSelect.value = data.codeFont;
 
@@ -207,10 +182,11 @@ searchInput.addEventListener('input', (e) => {
     codeSizeRange.value = cSize;
     codeSizeInput.value = cSize;
 
-    if(data.editorThemeName) {
-      themeSelect.value = data.editorThemeName;
-    } else {
-      themeSelect.selectedIndex = 0;
+    if(data.editorBgColor){
+      bgColorPicker.value = data.editorBgColor;
+    } 
+    else {
+      bgColorPicker.value = '';
     }
   });
 })();
@@ -218,21 +194,18 @@ searchInput.addEventListener('input', (e) => {
 
 applyBtn.addEventListener('click', async () => {
 
-  const selectedTheme = allThemes.find(t => t.name === themeSelect.value);
 
   const uiFont = uiSelect.value;
   const codeFont = codeSelect.value;
   const uiSize = uiSizeInput.value;
   const codeSize = codeSizeInput.value;
-  const editorThemeName = themeSelect.value;
-  const editorThemeColors = selectedTheme ? selectedTheme.colors : null;
 
-  await chrome.storage.sync.set({uiFont, codeFont, uiSize, codeSize, editorThemeName, editorThemeColors});
+  await chrome.storage.sync.set({uiFont, codeFont, uiSize, codeSize});
  
 });
 
 resetBtn.addEventListener('click', async () => {
-  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeName', 'editorThemeColors']);
+  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorBgColor']);
 
   uiSelect.value = '';
   codeSelect.value = '';
@@ -241,6 +214,6 @@ resetBtn.addEventListener('click', async () => {
   uiSizeRange.value = 14;
   codeSizeInput.value = 14;
   codeSizeRange.value = 14;
-  themeSelect.selectedIndex = 0;
+  bgColorPicker.value = '';
   
 });
