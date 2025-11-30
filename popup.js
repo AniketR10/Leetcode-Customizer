@@ -15,7 +15,8 @@ const bgColorPicker = document.getElementById('bgColorPicker');
 let allFonts = []; 
 let renderedCount = 0;
 const PAGE_SIZE = 100; 
-const loadedFontLinks = new Set(); 
+const loadedFontLinks = new Set();
+let saveTimeOut = null;
 
 
 function gkey(name){ 
@@ -34,11 +35,13 @@ linkInputs(codeSizeRange, codeSizeInput);
 bgColorPicker.addEventListener('input', () => {
   const bgColor = bgColorPicker.value;
 
-  if(bgColorPicker) {
-    chrome.storage.sync.set({
-      editorBgColor: bgColor,
-    })
+  if(saveTimeOut){
+    clearTimeout(saveTimeOut);
   }
+
+  saveTimeOut = setTimeout(() => {
+    chrome.storage.sync.set({editorBgColor: bgColor});
+  }, 100);
 })
 
 
