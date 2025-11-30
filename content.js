@@ -4,10 +4,10 @@ function safeHead() {
 }
 
 function applyFontsFromStorage() {
-  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize'], (data) => {
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeColors'], (data) => {
     const head = safeHead();
 
-    const {uiFont, codeFont} = data;
+    const {uiFont, codeFont, editorThemeColors} = data;
 
     const uSize = data.uiSize || 14;
     const cSize = data.codeSize || 14;
@@ -15,7 +15,7 @@ function applyFontsFromStorage() {
     const prev = document.getElementById('lc-font-changer-style');
     if (prev) prev.remove();
 
-    if (!uiFont && !codeFont && !data.uiSize && !data.codeSize) return;
+    if (!uiFont && !codeFont && !data.uiSize && !data.codeSize && !editorThemeColors) return;
 
   
     [uiFont, codeFont]
@@ -32,9 +32,7 @@ function applyFontsFromStorage() {
         }
       });
 
-    const style = document.createElement('style');
-    style.id = 'lc-font-changer-style';
-    style.textContent = `
+    let cssRules = `
       /* UI font & size */
       body { font-size: ${uSize}px !important; }
       * { font-family: "${uiFont || 'Inter'}", sans-serif !important; }
@@ -50,6 +48,48 @@ function applyFontsFromStorage() {
         font-family: inherit !important;
       }
     `;
+
+    if(editorThemeColors){
+      const {bg, text, selection} = editorThemeColors;
+      cssRules += `
+        /* 1. FORCE BACKGROUND on all main editor containers */
+        .monaco-editor,
+        .monaco-editor .monaco-editor-background,
+        .monaco-editor .margin,
+        .monaco-editor .inputarea {
+          background-color: ${bg} !important;
+        }
+
+        /* 2. MAKE TEXT LAYERS TRANSPARENT (So background shows through) */
+        .monaco-editor .view-lines,
+        .monaco-editor .view-overlays,
+        .monaco-editor .lines-content {
+          background-color: transparent !important;
+        }
+
+        /* 3. Text Color (Global fallback) */
+        .monaco-editor,
+        .monaco-editor .mtk1,
+        .monaco-editor .view-lines {
+          color: ${text} !important;
+        }
+
+        /* 4. Selection & Current Line */
+        .monaco-editor .current-line {
+          background-color: ${selection} !important;
+          border: none !important;
+        }
+        
+        /* 5. Gutter (Line Numbers) Text Color */
+        .monaco-editor .margin-view-overlays .line-numbers {
+           color: ${text} !important;
+           opacity: 0.5; /* Dim it slightly */
+        }
+      `;
+    }
+    const style = document.createElement('style');
+    style.id = 'lc-font-changer-style';
+    style.textContent = cssRules;
     head.appendChild(style);
   });
 }
@@ -58,7 +98,7 @@ function applyFontsFromStorage() {
 applyFontsFromStorage();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && (changes.uiFont || changes.codeFont || changes.uiSize || changes.codeSize)) {
+  if (area === 'sync' && (changes.uiFont || changes.codeFont || changes.uiSize || changes.codeSize || changes.editorThemeColors)) {
     applyFontsFromStorage();
   }
 });

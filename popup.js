@@ -10,8 +10,10 @@ const uiSizeRange = document.getElementById('uiSizeRange');
 const uiSizeInput = document.getElementById('uiSizeInput');
 const codeSizeRange = document.getElementById('codeSizeRange');
 const codeSizeInput = document.getElementById('codeSizeInput');
+const themeSelect = document.getElementById('themeSelect');
 
 let allFonts = []; 
+let allThemes = [];
 let renderedCount = 0;
 const PAGE_SIZE = 100; 
 const loadedFontLinks = new Set(); 
@@ -30,6 +32,23 @@ function linkInputs(range, number){
 linkInputs(uiSizeRange, uiSizeInput);
 linkInputs(codeSizeRange, codeSizeInput);
 
+themeSelect.addEventListener('change', () => {
+  const selectedName = themeSelect.value;
+  const themeObj = allThemes.find(t => t.name === selectedName);
+
+  if(themeObj) {
+    chrome.storage.sync.set({
+      editorThemeName: selectedName,
+      editorThemeColors: themeObj.colors
+    });
+  } else if(selectedName === ""){
+    chrome.storage.sync.set({
+      editorThemeName: "",
+      editorThemeColors: null
+    });
+  }
+});
+
 async function getGoogleFonts() {
   try {
    
@@ -43,6 +62,15 @@ async function getGoogleFonts() {
   }
 }
 
+async function getThemes() {
+  try {
+    const res = await fetch(chrome.runtime.getURL('themes.json'));
+    return await res.json();
+  } catch(e) {
+    console.warn("Themes fetch failed", e);
+    return [];
+  }
+}
 
 function renderChunk(filter = '') {
   const fontsToRender = allFonts.filter(f =>
@@ -148,59 +176,26 @@ searchInput.addEventListener('input', (e) => {
 });
 
 
-
-function injectFontsToTab(tabId, uiFont, codeFont, uiSize, codeSize){
-  chrome.scripting.executeScript({
-    target: { tabId },
-    func: (uiFont, codeFont, uiSize, codeSize) => {
-  
-      const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
-      [uiFont, codeFont].filter(Boolean).forEach(fn => {
-        const key = fn.replace(/\s+/g,'+');
-        if (!document.querySelector(`link[data-font="${key}"]`)) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = `https://fonts.googleapis.com/css2?family=${key}&display=swap`;
-          link.setAttribute('data-font', key);
-          head.appendChild(link);
-        }
-      });
-     
-      const prev = document.getElementById('lc-font-changer-style');
-      if (prev) prev.remove();
-   
-      const style = document.createElement('style');
-      style.id = 'lc-font-changer-style';
-      style.textContent = `
-        /* Global UI */
-        body {font-size: ${uiSize}px !important; }
-        * { font-family: "${uiFont || 'Inter'}", sans-serif !important; }
-
-        /* Code editors and monospace areas */
-        .monaco-editor *, .cm-editor *, code, pre { 
-        font-family: "${codeFont || 'JetBrains Mono'}", monospace !important; 
-        font-size: ${codeSize}px !important;
-        }
-
-        /* preserve icons */
-        [class*="icon"], .codicon, [class^="icon-"], .anticon { font-family: inherit !important; }
-      `;
-      head.appendChild(style);
-    },
-    args: [uiFont, codeFont, uiSize, codeSize]
-  });
-}
-
 (async function init(){
 
-  loadingEl.textContent = 'Fetching Google Fonts metadata…';
+  loadingEl.textContent = 'Loading resources…';
   const g = await getGoogleFonts();
-
+  const th = await getThemes();
   allFonts = g;
+  allThemes = th;
+
   loadingEl.textContent = '';
   refreshList('');
 
-  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize'], (data) => {
+  themeSelect.innerHTML = '';
+  allThemes.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.name;
+    opt.textContent = t.name;
+    themeSelect.appendChild(opt);
+  })
+
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeName'], (data) => {
     if (data.uiFont) uiSelect.value = data.uiFont;
     if (data.codeFont) codeSelect.value = data.codeFont;
 
@@ -211,26 +206,33 @@ function injectFontsToTab(tabId, uiFont, codeFont, uiSize, codeSize){
     uiSizeInput.value = uSize;
     codeSizeRange.value = cSize;
     codeSizeInput.value = cSize;
+
+    if(data.editorThemeName) {
+      themeSelect.value = data.editorThemeName;
+    } else {
+      themeSelect.selectedIndex = 0;
+    }
   });
 })();
 
 
 applyBtn.addEventListener('click', async () => {
+
+  const selectedTheme = allThemes.find(t => t.name === themeSelect.value);
+
   const uiFont = uiSelect.value;
   const codeFont = codeSelect.value;
   const uiSize = uiSizeInput.value;
   const codeSize = codeSizeInput.value;
+  const editorThemeName = themeSelect.value;
+  const editorThemeColors = selectedTheme ? selectedTheme.colors : null;
 
-  await chrome.storage.sync.set({uiFont, codeFont, uiSize, codeSize});
+  await chrome.storage.sync.set({uiFont, codeFont, uiSize, codeSize, editorThemeName, editorThemeColors});
  
-  chrome.tabs.query({active:true, currentWindow:true}, (tabs) => {
-    if (!tabs[0]) return;
-    injectFontsToTab(tabs[0].id, uiFont, codeFont, uiSize, codeSize);
-  });
 });
 
 resetBtn.addEventListener('click', async () => {
-  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize']);
+  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeName', 'editorThemeColors']);
 
   uiSelect.value = '';
   codeSelect.value = '';
@@ -239,15 +241,6 @@ resetBtn.addEventListener('click', async () => {
   uiSizeRange.value = 14;
   codeSizeInput.value = 14;
   codeSizeRange.value = 14;
+  themeSelect.selectedIndex = 0;
   
-  chrome.tabs.query({active:true,currentWindow:true}, (tabs) => {
-    if (!tabs[0]) return;
-    chrome.scripting.executeScript({
-      target:{tabId:tabs[0].id},
-      func: () => {
-        const s = document.getElementById('lc-font-changer-style'); if (s) s.remove();
-        document.querySelectorAll('link[data-font]').forEach(l=>l.remove());
-      }
-    });
-  });
 });

@@ -162,7 +162,7 @@ button.secondary:hover {
   border-radius: 4px;
 }
 
-/* --- Size Control Styling --- */
+
 .size-label {
   display: block;
   font-size: 11px;
@@ -179,7 +179,7 @@ button.secondary:hover {
   border-radius: 6px;
 }
 
-/* The small number box */
+
 input[type="number"] {
   width: 40px;
   background: transparent;
@@ -194,22 +194,21 @@ input[type="number"]:focus {
   color: var(--brand-orange);
 }
 
-/* Remove up/down arrows from number input */
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
   margin: 0; 
 }
 
-/* Custom Range Slider Styling */
+
 input[type="range"] {
-  -webkit-appearance: none; /* Override default look */
+  -webkit-appearance: none; 
   width: 100%;
   background: transparent;
   cursor: pointer;
 }
 
-/* The Slider Track */
+
 input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 4px;
@@ -217,13 +216,40 @@ input[type="range"]::-webkit-slider-runnable-track {
   border-radius: 2px;
 }
 
-/* The Slider Thumb (The circle you drag) */
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 14px;
   width: 14px;
   border-radius: 50%;
   background: var(--brand-orange);
-  margin-top: -5px; /* Centers thumb on track */
+  margin-top: -5px; 
   border: 2px solid var(--surface-primary);
+}
+
+
+select {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--surface-primary); 
+  color: var(--text-main);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  font-size: 13px;
+  
+}
+
+
+select:hover, select:focus {
+  background-color: var(--surface-hover);
+  border-color: var(--brand-orange);
+}
+
+
+select option {
+  background-color: var(--surface-primary); 
+  color: var(--text-main);
+  padding: 10px;
 }

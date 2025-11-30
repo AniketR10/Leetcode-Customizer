@@ -1,0 +1,50 @@
+[
+  {
+    "name": "LeetCode Dark",
+    "colors": { "bg": "#1a1a1a", "text": "#eff1f6", "selection": "#264f78" }
+  },
+  {
+    "name": "Dracula",
+    "colors": { "bg": "#282a36", "text": "#f8f8f2", "selection": "#44475a" }
+  },
+  {
+    "name": "Monokai",
+    "colors": { "bg": "#272822", "text": "#f8f8f2", "selection": "#49483e" }
+  },
+  {
+    "name": "GitHub Dark",
+    "colors": { "bg": "#0d1117", "text": "#c9d1d9", "selection": "#1f6feb" }
+  },
+  {
+    "name": "GitHub Light",
+    "colors": { "bg": "#ffffff", "text": "#24292e", "selection": "#0366d6" }
+  },
+  {
+    "name": "Solarized Dark",
+    "colors": { "bg": "#002b36", "text": "#839496", "selection": "#073642" }
+  },
+  {
+    "name": "Material Ocean",
+    "colors": { "bg": "#0f111a", "text": "#8f93a2", "selection": "#1f2233" }
+  },
+  {
+    "name": "One Dark Pro",
+    "colors": { "bg": "#282c34", "text": "#abb2bf", "selection": "#3e4451" }
+  },
+  {
+    "name": "Nord",
+    "colors": { "bg": "#2e3440", "text": "#d8dee9", "selection": "#434c5e" }
+  },
+  {
+    "name": "OLED Black",
+    "colors": { "bg": "#000000", "text": "#e0e0e0", "selection": "#333333" }
+  },
+  {
+    "name": "Synthwave '84",
+    "colors": { "bg": "#262335", "text": "#ffffff", "selection": "#44475a" }
+  },
+  {
+    "name": "Cyberpunk",
+    "colors": { "bg": "#02020b", "text": "#00ff9c", "selection": "#ff003c" }
+  }
+]
