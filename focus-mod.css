@@ -1,4 +1,7 @@
 :root {
+
+  color-scheme: dark;
+
   --surface-primary: #323232;  
   --surface-hover:   #3a3a3a;  
   
@@ -28,6 +31,7 @@ h3 {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-main);
+  text-align: center;
 }
 
 

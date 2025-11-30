@@ -4,10 +4,10 @@ function safeHead() {
 }
 
 function applyFontsFromStorage() {
-  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorBgColor'], (data) => {
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeColors'], (data) => {
     const head = safeHead();
 
-    const {uiFont, codeFont, editorBgColor} = data;
+    const {uiFont, codeFont, editorThemeColors} = data;
 
     const uSize = data.uiSize || 14;
     const cSize = data.codeSize || 14;
@@ -15,7 +15,7 @@ function applyFontsFromStorage() {
     const prev = document.getElementById('lc-font-changer-style');
     if (prev) prev.remove();
 
-    if (!uiFont && !codeFont && !data.uiSize && !data.codeSize && !editorBgColor) return;
+    if (!uiFont && !codeFont && !data.uiSize && !data.codeSize && !editorThemeColors) return;
 
   
     [uiFont, codeFont]
@@ -49,22 +49,49 @@ function applyFontsFromStorage() {
       }
     `;
 
-    if(editorBgColor){
-     // const {bg, text, selection} = editorBgColor;
+    if(editorThemeColors){
+     const { bg, text, selection, useSmartFilter } = editorThemeColors;
+      const safeText = text || '#eff1f6'; 
+      const safeSel = selection || '#264f78';
+
+      // if bg is light, we invert the code colors to make them dark/readable
+      const syntaxFilter = useSmartFilter 
+        ? 'invert(1) hue-rotate(180deg) brightness(0.75) contrast(1.2)' 
+        : 'none';
       cssRules += `
-        /* 1. FORCE BACKGROUND on all main editor containers */
+        /* Backgrounds */
         .monaco-editor,
         .monaco-editor .monaco-editor-background,
         .monaco-editor .margin,
         .monaco-editor .inputarea {
-          background-color: ${editorBgColor} !important;
+          background-color: ${bg} !important;
         }
 
-        /* 2. MAKE TEXT LAYERS TRANSPARENT (So background shows through) */
+        /* 2. Text Transparency */
         .monaco-editor .view-lines,
-        .monaco-editor .view-overlays,
-        .monaco-editor .lines-content {
+        .monaco-editor .view-overlays {
           background-color: transparent !important;
+        }
+
+        
+        .monaco-editor,
+        .monaco-editor .mtk1 {
+          color: ${safeText} !important;
+        }
+
+        
+        .monaco-editor .view-lines span[class*="mtk"]:not(.mtk1) {
+          filter: ${syntaxFilter} !important;
+        }
+
+       
+        .monaco-editor .current-line {
+          background-color: ${safeSel} !important;
+          border: none !important;
+        }
+        .monaco-editor .margin-view-overlays .line-numbers {
+           color: ${safeText} !important;
+           opacity: 0.5;
         }
       `;
     }
@@ -79,7 +106,7 @@ function applyFontsFromStorage() {
 applyFontsFromStorage();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && (changes.uiFont || changes.codeFont || changes.uiSize || changes.codeSize || changes.editorBgColor)) {
+  if (area === 'sync' && (changes.uiFont || changes.codeFont || changes.uiSize || changes.codeSize || changes.editorThemeColors)) {
     applyFontsFromStorage();
   }
 });

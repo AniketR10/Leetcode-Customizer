@@ -32,17 +32,36 @@ function linkInputs(range, number){
 linkInputs(uiSizeRange, uiSizeInput);
 linkInputs(codeSizeRange, codeSizeInput);
 
-bgColorPicker.addEventListener('input', () => {
-  const bgColor = bgColorPicker.value;
 
-  if(saveTimeOut){
-    clearTimeout(saveTimeOut);
-  }
+function isLightColor(hex) {
+    if (!hex || hex.length < 7) return false;
+    var r = parseInt(hex.substr(1, 2), 16);
+    var g = parseInt(hex.substr(3, 2), 16);
+    var b = parseInt(hex.substr(5, 2), 16);
+    
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return yiq >= 128; 
+}
+
+
+bgColorPicker.addEventListener('input', () => {
+  const bg = bgColorPicker.value;
+  const isLight = isLightColor(bg);
+
+  if (saveTimeOut) clearTimeout(saveTimeOut);
 
   saveTimeOut = setTimeout(() => {
-    chrome.storage.sync.set({editorBgColor: bgColor});
+    const themeObj = {
+      bg: bg,
+     
+      text: isLight ? '#000000' : '#eff1f6', 
+      selection: isLight ? '#b3d7ff' : '#264f78',
+     
+      useSmartFilter: isLight 
+    };
+    chrome.storage.sync.set({ editorThemeColors: themeObj });
   }, 100);
-})
+});
 
 
 async function getGoogleFonts() {
@@ -173,7 +192,7 @@ searchInput.addEventListener('input', (e) => {
   refreshList('');
 
 
-  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorBgColor'], (data) => {
+  chrome.storage.sync.get(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeColors'], (data) => {
     if (data.uiFont) uiSelect.value = data.uiFont;
     if (data.codeFont) codeSelect.value = data.codeFont;
 
@@ -185,11 +204,11 @@ searchInput.addEventListener('input', (e) => {
     codeSizeRange.value = cSize;
     codeSizeInput.value = cSize;
 
-    if(data.editorBgColor){
-      bgColorPicker.value = data.editorBgColor;
-    } 
+   if (data.editorThemeColors && data.editorThemeColors.bg) {
+      bgColorPicker.value = data.editorThemeColors.bg;
+    }
     else {
-      bgColorPicker.value = '';
+      bgColorPicker.value = '#1a1a1a';
     }
   });
 })();
@@ -208,7 +227,7 @@ applyBtn.addEventListener('click', async () => {
 });
 
 resetBtn.addEventListener('click', async () => {
-  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorBgColor']);
+  await chrome.storage.sync.remove(['uiFont','codeFont', 'uiSize', 'codeSize', 'editorThemeColors']);
 
   uiSelect.value = '';
   codeSelect.value = '';
@@ -217,6 +236,6 @@ resetBtn.addEventListener('click', async () => {
   uiSizeRange.value = 14;
   codeSizeInput.value = 14;
   codeSizeRange.value = 14;
-  bgColorPicker.value = '';
+  bgColorPicker.value = '#1a1a1a';
   
 });
