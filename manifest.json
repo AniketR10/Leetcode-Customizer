@@ -3,7 +3,7 @@
   "name": "LeetCode Customizer",
   "version": "1.0.1",
   "description": "Lets you pick any Google font and apply it across Leetcode's UI and Code Editor.",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage"],
   "host_permissions": ["*://*.leetcode.com/*"],
   "action": { "default_popup": "popup.html", "default_title": "Font Changer" },
   "icons": {
